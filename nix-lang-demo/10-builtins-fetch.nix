@@ -11,10 +11,13 @@ in
     sha256 = "1md7jsfd8pa45z73bz1kszpp01yw6x5ljkjk2hx7wl800any6465";
   };
   demo_02_fetchGit = fetchGit {
-    url = "https://github.com/NixOS/nixpkgs.git";
-    rev = "4a1c12792864bcdfb514c7edce0106c426be08bc";
+    name = "learn-nix-demo-source";
+    url = "https://github.com/rectcircle/learn-nix-demo.git";
+    rev = "7f4952a6ecf7dcd90c8bb0c8d14795ae1add5326";
     ref = "master";
     shallow = true;
   };
-  # demo_03_fetchTarball = fetchTarball {};
+  demo_03_fetchTarball = fetchTarball {
+    url = "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/releases/nixpkgs-unstable%40nixpkgs-23.05pre462063.2ce9b9842b5/nixexprs.tar.xz";
+  };
 }
