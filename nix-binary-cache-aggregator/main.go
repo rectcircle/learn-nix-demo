@@ -1,13 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
-	"path"
+	"strings"
 )
 
 type upstream struct {
@@ -33,25 +32,27 @@ func newHandle(httpProxy string, upstreams []upstream) (func(w http.ResponseWrit
 		// 尝试从 upstream 中获取
 		var resp *http.Response
 		for i, u := range upstreams {
-			targetPath := path.Join(u.URL, r.URL.Path)
+			targetPath := strings.TrimSuffix(u.URL, "/") + r.URL.Path
 			c := client
 			if u.UseProxy {
 				c = proxyClient
 			}
 			_resp, err := c.Get(targetPath)
 			if err != nil {
-				fmt.Printf("  try upstream[%d]: %s, error: %s", i, targetPath, err)
+				log.Printf("  try upstream[%d]: %s, error: %s", i, targetPath, err)
 				continue
 			}
 			if _resp.StatusCode != 200 {
-				fmt.Printf("  try upstream[%d]: %s, status code is: %d", i, targetPath, _resp.StatusCode)
+				log.Printf("  try upstream[%d]: %s, status code is: %d", i, targetPath, _resp.StatusCode)
 				_resp.Body.Close()
 				continue
 			}
+			log.Printf("  try upstream[%d]: %s, success", i, targetPath)
 			resp = _resp
+			break
 		}
 		if resp == nil {
-			fmt.Printf("  all upstream not found")
+			log.Printf("  all upstream not found")
 			w.WriteHeader(404)
 			return
 		}
